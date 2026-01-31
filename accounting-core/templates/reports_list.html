@@ -1,0 +1,35 @@
+<!-- app/templates/reports_list.html -->
+{% extends "base.html" %}
+
+{% block title %}Отчёты{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto pt-6 pb-20 px-4 md:pb-6">
+  <a href="/" class="text-blue-600 text-sm mb-4 inline-block">← Назад</a>
+  <h2 class="text-xl font-bold mb-4">История отчётов</h2>
+
+  {% if reports %}
+    <div class="space-y-3">
+      {% for report in reports %}
+        <div class="bg-white p-3 rounded shadow">
+          <div class="font-medium">
+            {{ report.report_date.strftime('%d %b %Y') }}
+            {% if report.is_night %}<span class="text-purple-600">· Ночь</span>{% endif %}
+          </div>
+          <div class="text-sm text-gray-600">
+            {{ report.start_time.strftime('%H:%M') }} – {{ report.end_time.strftime('%H:%M') }}
+          </div>
+          <div class="mt-2 flex justify-between">
+            <span class="text-green-600 font-medium">Выручка: {{ "%.2f"|format(report.total_revenue) }} ₽</span>
+            <span class="text-red-600">Долг: {{ "%.2f"|format(report.debt_payment_made) }} ₽</span>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="text-center py-8 text-gray-500">
+      Пока нет отчётов
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

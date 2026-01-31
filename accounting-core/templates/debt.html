@@ -1,0 +1,39 @@
+<!-- app/templates/debt.html -->
+{% extends "base.html" %}
+
+{% block title %}Долг{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto pt-6 pb-20 px-4 md:pb-6">
+  <a href="/" class="text-blue-600 text-sm mb-4 inline-block">← Назад</a>
+  <h2 class="text-xl font-bold mb-6">Долг перед начальником</h2>
+
+  <!-- Текущий долг -->
+  <div class="bg-white p-4 rounded-lg shadow mb-6 text-center">
+    <div class="text-3xl font-bold text-red-600">{{ "%.0f"|format(debt_info.total_debt) }} ₽</div>
+    <div class="text-sm text-gray-600 mt-1">текущий долг</div>
+  </div>
+
+  <!-- Детализация -->
+  <h3 class="font-medium mb-3">Источники долга</h3>
+  <ul class="space-y-2 mb-6">
+    <li class="flex justify-between">
+      <span>Базовый долг</span>
+      <span>{{ "%.0f"|format(debt_info.base_debt) }} ₽</span>
+    </li>
+    <li class="flex justify-between text-red-600">
+      <span>Поставки</span>
+      <span>+{{ "%.0f"|format(debt_info.supply_debt) }} ₽</span>
+    </li>
+    <li class="flex justify-between text-green-600">
+      <span>Выплачено</span>
+      <span>-{{ "%.0f"|format(debt_info.total_paid) }} ₽</span>
+    </li>
+  </ul>
+
+  <!-- Быстрое действие -->
+  <a href="/reports/new" class="w-full block bg-blue-600 text-white text-center py-2 rounded hover:bg-blue-700">
+    Отдать часть долга →
+  </a>
+</div>
+{% endblock %}

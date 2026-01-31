@@ -1,0 +1,106 @@
+<!-- app/templates/supplies_new.html -->
+{% extends "base.html" %}
+
+{% block title %}Новая поставка{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto pt-6 pb-20 px-4 md:pb-6">
+  <a href="/" class="text-blue-600 text-sm mb-4 inline-block">← Назад</a>
+  <h2 class="text-xl font-bold mb-6">Новая поставка от начальника</h2>
+
+  <form id="supplyForm" class="space-y-4">
+    <div>
+      <label class="block text-sm font-medium mb-1">Дата поставки</label>
+      <input type="datetime-local" name="supply_date" class="w-full p-2 border rounded">
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Поставщик</label>
+      <input type="text" name="supplier_name" value="Начальник" class="w-full p-2 border rounded">
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Примечание</label>
+      <textarea name="note" class="w-full p-2 border rounded" rows="2"></textarea>
+    </div>
+
+    <div class="border-t pt-4 mt-4">
+      <h3 class="font-medium mb-2">Товары</h3>
+      <div id="supplyItems" class="space-y-2">
+        <div class="flex gap-2 supply-item">
+          <select name="product" class="flex-1 p-2 border rounded text-sm">
+            <option value="1">Пиво</option>
+            <option value="2">Водка</option>
+            <option value="3">Виски</option>
+            <option value="4">Кола</option>
+          </select>
+          <input type="number" name="quantity" placeholder="Кол-во" class="w-20 p-2 border rounded text-sm" min="1" value="1">
+          <input type="number" name="price" step="0.01" placeholder="Цена за ед." class="w-24 p-2 border rounded text-sm" min="0.01">
+        </div>
+      </div>
+      <button type="button" id="addSupplyItemBtn" class="text-blue-600 text-sm mt-2">+ Добавить товар</button>
+    </div>
+
+    <button type="submit" class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">
+      Сохранить поставку
+    </button>
+  </form>
+</div>
+
+<script>
+// Добавление строки
+document.getElementById('addSupplyItemBtn').addEventListener('click', () => {
+  const container = document.getElementById('supplyItems');
+  const newItem = container.firstElementChild.cloneNode(true);
+  newItem.querySelectorAll('input').forEach(inp => {
+    if (inp.type === 'number') inp.value = inp.placeholder.includes('Кол-во') ? '1' : '';
+  });
+  container.appendChild(newItem);
+});
+
+// Отправка
+document.getElementById('supplyForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const items = [];
+  document.querySelectorAll('.supply-item').forEach(row => {
+    const qty = parseInt(row.querySelector('[name="quantity"]').value);
+    const price = parseFloat(row.querySelector('[name="price"]').value);
+    if (qty > 0 && price > 0) {
+      items.push({
+        product_id: parseInt(row.querySelector('[name="product"]').value),
+        quantity: qty,
+        price_per_unit: price
+      });
+    }
+  });
+
+  if (items.length === 0) {
+    alert('Добавьте хотя бы один товар!');
+    return;
+  }
+
+  const formData = new FormData(e.target);
+  const data = {
+    supply_date: formData.get('supply_date') || new Date().toISOString().slice(0, 16),
+    supplier_name: formData.get('supplier_name'),
+    note: formData.get('note') || null,
+    items: items
+  };
+
+  try {
+    const res = await fetch('/api/v1/supplies', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+      window.location.href = '/supplies';
+    } else {
+      alert('Ошибка: ' + (await res.text()));
+    }
+  } catch (err) {
+    alert('Сеть: ' + err.message);
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,128 @@
+<!-- app/templates/reports_new.html -->
+{% extends "base.html" %}
+
+{% block title %}Новый отчёт{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto pt-6 pb-20 px-4 md:pb-6">
+  <a href="/" class="text-blue-600 text-sm mb-4 inline-block">← Назад</a>
+  <h2 class="text-xl font-bold mb-6">Новый отчёт за смену</h2>
+
+  <form id="reportForm" class="space-y-4">
+    <div>
+      <label class="block text-sm font-medium mb-1">Начало смены</label>
+      <input type="datetime-local" name="start_time" class="w-full p-2 border rounded">
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Окончание смены</label>
+      <input type="datetime-local" name="end_time" class="w-full p-2 border rounded">
+    </div>
+    <div class="flex items-center">
+      <input type="checkbox" id="is_night" name="is_night" class="mr-2">
+      <label for="is_night" class="text-sm">Ночная смена</label>
+    </div>
+
+    <div class="border-t pt-4 mt-4">
+      <h3 class="font-medium mb-2">Продажи</h3>
+      <div id="salesItems" class="space-y-2">
+        <!-- Первая строка -->
+        <div class="flex gap-2 sales-item">
+          <select name="product" class="flex-1 p-2 border rounded text-sm">
+            <option value="1">Пиво</option>
+            <option value="2">Водка</option>
+            <option value="3">Виски</option>
+            <option value="4">Кола</option>
+            <option value="5">Шашлык</option>
+          </select>
+          <input type="number" name="quantity" placeholder="Кол-во" class="w-20 p-2 border rounded text-sm" min="1" value="1">
+          <input type="number" name="price" step="0.01" placeholder="Цена" class="w-24 p-2 border rounded text-sm" min="0.01">
+        </div>
+      </div>
+      <button type="button" id="addProductBtn" class="text-blue-600 text-sm mt-2">+ Добавить товар</button>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Платёж по долгу (₽)</label>
+      <input type="number" name="debt_payment_made" step="0.01" value="3333.33" class="w-full p-2 border rounded">
+    </div>
+
+    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+      Сохранить отчёт
+    </button>
+  </form>
+</div>
+
+<script>
+// Добавление новой строки товара
+document.getElementById('addProductBtn').addEventListener('click', () => {
+  const container = document.getElementById('salesItems');
+  const newItem = container.firstElementChild.cloneNode(true);
+  // Очищаем значения (кроме select)
+  newItem.querySelectorAll('input').forEach(inp => {
+    if (inp.type === 'number') inp.value = inp.placeholder.includes('Кол-во') ? '1' : '';
+  });
+  container.appendChild(newItem);
+});
+
+// Отправка формы
+document.getElementById('reportForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  // Собираем все строки продаж
+  const salesItems = [];
+  document.querySelectorAll('.sales-item').forEach(row => {
+    const productSelect = row.querySelector('[name="product"]');
+    const quantityInput = row.querySelector('[name="quantity"]');
+    const priceInput = row.querySelector('[name="price"]');
+
+    const qty = parseInt(quantityInput.value);
+    const price = parseFloat(priceInput.value);
+
+    if (qty > 0 && price > 0) {
+      salesItems.push({
+        product_id: parseInt(productSelect.value),
+        quantity_sold: qty,
+        price_sold_at: price
+      });
+    }
+  });
+
+  if (salesItems.length === 0) {
+    alert('Добавьте хотя бы один товар!');
+    return;
+  }
+
+  const formData = new FormData(e.target);
+  const data = {
+    start_time: formData.get('start_time'),
+    end_time: formData.get('end_time'),
+    is_night: formData.has('is_night'),
+    debt_payment_made: parseFloat(formData.get('debt_payment_made')) || 0,
+    sales_items: salesItems
+  };
+
+  // Проверка дат
+  if (!data.start_time || !data.end_time) {
+    alert('Укажите время начала и окончания смены');
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/v1/reports', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+      window.location.href = '/reports';
+    } else {
+      const errorText = await res.text();
+      alert('Ошибка сохранения:\n' + errorText);
+    }
+  } catch (err) {
+    alert('Ошибка сети: ' + err.message);
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,49 @@
+[project]
+name = "shiftledger"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "asyncpg>=0.31.0",
+    "fastapi>=0.128.0",
+    "jinja2>=3.1.6",
+    "psycopg>=3.3.2",
+    "psycopg2-binary>=2.9.11",
+    "pydantic>=2.12.5",
+    "pydantic-settings>=2.12.0",
+    "python-dotenv>=1.2.1",
+    "shiftledger-shared",
+    "sqlalchemy>=2.0.45",
+    "uvicorn>=0.40.0",
+]
+[tool.ruff]
+line-length = 79
+exclude = ["migrations", "venv", "dist", "build", "wheels", "*.egg-info"]
+
+[tool.ruff.lint]
+select = [
+    "E",  
+    "F",  
+    "I",  
+    "C4", 
+    "B",  
+    "UP", 
+    "TID",
+    "PL", 
+]
+
+[dependency-groups]
+dev = [
+    "isort>=7.0.0",
+    "mypy>=1.18.2",
+    "ruff>=0.13.3",
+]
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+line-ending = "auto"
+
+[tool.uv.sources]
+shiftledger-shared = { git = "https://github.com/Javicle/shiftledger-shared.git" }

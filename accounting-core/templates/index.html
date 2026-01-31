@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-md mx-auto pt-6 pb-20 px-4 md:pb-6">
+  <h1 class="text-2xl font-bold text-center mb-6">Бухгалтерия</h1>
+
+<!-- Карточка долга -->
+<div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded">
+  <div class="text-red-800 font-medium">
+    🔴 Долг: <span class="font-bold">{{ "%.0f"|format(debt_info.total_debt) }} ₽</span>
+  </div>
+  <div class="text-sm text-red-600">
+    из них {{ "%.0f"|format(debt_info.supply_debt) }} ₽ — за поставки
+  </div>
+</div>
+
+<!-- Сегодня -->
+<div class="bg-white p-4 rounded-lg shadow mb-6">
+  {% if today_report %}
+    <div class="text-gray-700 mb-2">
+      📅 Сегодня: <span class="font-medium text-green-600">отчёт создан</span>
+    </div>
+    <div class="text-sm mb-2">
+      <strong>Выручка:</strong> {{ "%.2f"|format(today_report.total_revenue) }} ₽
+    </div>
+    <div class="text-sm mb-2">
+      <strong>Платёж по долгу:</strong> {{ "%.2f"|format(today_report.debt_payment_made) }} ₽
+    </div>
+    <div class="text-sm text-gray-600">
+      Продажи:
+      {% for item in today_report.sales_items %}
+        {{ item.product.name }}: {{ item.quantity_sold }} × {{ "%.2f"|format(item.price_sold_at) }} ₽
+        {% if not loop.last %}, {% endif %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="text-gray-700 mb-3">
+      📅 Сегодня: <span class="font-medium text-red-600">отчёт не создан</span>
+    </div>
+    <a href="/reports/new" class="w-full block bg-blue-600 text-white text-center py-2 rounded hover:bg-blue-700">
+      ➕ Создать отчёт
+    </a>
+  {% endif %}
+</div>
+
+<!-- Быстрые действия -->
+<div class="grid grid-cols-2 gap-4">
+  <a href="/supplies/new" class="bg-green-100 text-green-800 p-4 rounded-lg text-center font-medium hover:bg-green-200">
+    📥 Новая поставка
+  </a>
+  <a href="/reports/new" class="bg-blue-100 text-blue-800 p-4 rounded-lg text-center font-medium hover:bg-blue-200">
+    📊 Новый отчёт
+  </a>
+  <a href="/supplies" class="bg-purple-100 text-purple-800 p-4 rounded-lg text-center font-medium hover:bg-purple-200">
+    📦 Поставки
+  </a>
+  <a href="/reports" class="bg-amber-100 text-amber-800 p-4 rounded-lg text-center font-medium hover:bg-amber-200">
+    📋 Отчёты
+  </a>
+</div>
+{% endblock %}

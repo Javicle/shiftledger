@@ -53,3 +53,8 @@ shiftledger-shared = { git = "https://github.com/Javicle/shiftledger-shared.git"
 
 [tool.uv.workspace]
 members = ["accounting-core", "telegram-bot"]
+
+
+
+[tool.basedpyright.analysis]
+reportUnusedExpression = false

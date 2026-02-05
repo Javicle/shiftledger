@@ -1,0 +1,11 @@
+[project]
+name = "telegram-bot"
+version = "0.1.0"
+dependencies = [
+  "aiogram>=3.13.0",
+  "aiohttp>=3.10.0",
+  "python-dotenv>=1.0.1"
+]
+
+
+

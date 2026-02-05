@@ -6,7 +6,8 @@ from aiogram.types import InaccessibleMessage, Message, User
 from aiogram.types.maybe_inaccessible_message_union import (
     MaybeInaccessibleMessageUnion,
 )
-from exc import FakeUser, MessageNotFound, UserNotFound
+
+from .exc import FakeUser, MessageNotFound, UserNotFound
 
 logger = getLogger(__name__)
 

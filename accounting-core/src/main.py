@@ -11,10 +11,12 @@ from fastapi.templating import Jinja2Templates
 # application
 app = FastAPI(title='Бухалтерия')
 # templates
-templates = Jinja2Templates(directory='accounting-core/templates')
+templates = Jinja2Templates(directory='accounting-core/src/templates')
 # static files
 app.mount(
-    '/static', StaticFiles(directory='accounting-core/static'), name='static'
+    '/static',
+    StaticFiles(directory='accounting-core/src/static'),
+    name='static',
 )
 # create database tables
 create_tables()

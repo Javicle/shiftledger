@@ -47,3 +47,10 @@ async def validate_username_from_user(user: User) -> str:
         raise FakeUser(f'User with id {user.id} not have username')
 
     return username
+
+
+async def validate_text(mess: Message) -> str:
+    if not mess.text:
+        raise ValueError('Not text in message')
+
+    return mess.text

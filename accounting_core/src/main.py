@@ -1,12 +1,12 @@
 import uvicorn
-from api.deps import get_db_session_dep
 from api.v1 import categories, products, reports, supplies
-from crud.debts import get_total_debt_breakdown
-from crud.reports import get_shift_reports, get_today_report
-from database import create_tables
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+
+from src.crud.debts import get_total_debt_breakdown
+from src.crud.reports import get_shift_reports, get_today_report
+from src.database import create_tables
 
 # application
 app = FastAPI(title='Бухалтерия')
@@ -30,12 +30,12 @@ app.include_router(categories.router, prefix='/api/v1')
 
 # route to view main page
 @app.get('/', include_in_schema=False)
-async def home(request: Request, db: get_db_session_dep):
-    debt_info = get_total_debt_breakdown(db)
+async def home(request: Request):
+    debt_info = get_total_debt_breakdown()
 
     today_report = None
     try:
-        today_report = get_today_report(db)
+        today_report = get_today_report()
     except HTTPException:
         today_report = None
 
@@ -55,8 +55,8 @@ async def reports_new(request: Request):
 
 
 @app.get('/reports', include_in_schema=False)
-async def reports_list(request: Request, db: get_db_session_dep):
-    reports = get_shift_reports(db, limit=50)
+async def reports_list(request: Request):
+    reports = get_shift_reports(limit=50)
     return templates.TemplateResponse(
         'reports_list.html', {'request': request, 'reports': reports}
     )
@@ -77,8 +77,8 @@ async def supplies_list(request: Request):
 
 
 @app.get('/debt', include_in_schema=False)
-async def debt_page(request: Request, db: get_db_session_dep):
-    debt_info = get_total_debt_breakdown(db)
+async def debt_page(request: Request):
+    debt_info = get_total_debt_breakdown()
     return templates.TemplateResponse(
         'debt.html', {'request': request, 'debt_info': debt_info}
     )

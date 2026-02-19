@@ -1,41 +1,39 @@
 # app/schemas.py
 from datetime import date, datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 # ========================
 # Категории и продукты
 # ========================
 
 
-class ProductCategoryCreate(BaseModel):
+class Model(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ProductCategoryCreate(Model):
     name: str = Field(..., min_length=1, max_length=50)
     description: str | None = None
 
 
-class ProductCategoryRead(BaseModel):
+class ProductCategoryRead(Model):
     id: int
     name: str
     description: str | None
 
-    class Config:
-        from_attributes = True
 
-
-class ProductCreate(BaseModel):
+class ProductCreate(Model):
     name: str = Field(..., min_length=1, max_length=100)
     category_id: int
     default_price: float = Field(gt=0)
 
 
-class ProductRead(BaseModel):
+class ProductRead(Model):
     id: int
     name: str
     category_id: int
     default_price: float
-
-    class Config:
-        from_attributes = True
 
 
 # ========================
@@ -43,39 +41,33 @@ class ProductRead(BaseModel):
 # ========================
 
 
-class SupplyItemCreate(BaseModel):
+class SupplyItemCreate(Model):
     product_id: int
     quantity: int = Field(gt=0)
     price_per_unit: float = Field(gt=0)
 
 
-class SupplyItemRead(BaseModel):
+class SupplyItemRead(Model):
     id: int
     product_id: int
     quantity: int
     price_per_unit: float
     total_cost: float  # вычисляется в модели
 
-    class Config:
-        from_attributes = True
 
-
-class SupplyCreate(BaseModel):
-    supply_date: datetime | None = None  # если не указано — сейчас
+class SupplyCreate(Model):
+    supply_date: datetime | None = None
     supplier_name: str = 'Начальник'
     note: str | None = None
     items: list[SupplyItemCreate]  # вложенные позиции
 
 
-class SupplyRead(BaseModel):
+class SupplyRead(Model):
     id: int
     supply_date: datetime
     supplier_name: str
     note: str | None
     items: list[SupplyItemRead]
-
-    class Config:
-        from_attributes = True
 
 
 # ========================
@@ -83,24 +75,21 @@ class SupplyRead(BaseModel):
 # ========================
 
 
-class SaleItemCreate(BaseModel):
+class SaleItemCreate(Model):
     product_id: int
     quantity_sold: int = Field(gt=0)
     price_sold_at: float = Field(gt=0)
 
 
-class SaleItemRead(BaseModel):
+class SaleItemRead(Model):
     id: int
     product_id: int
     quantity_sold: int
     price_sold_at: float
     revenue: float  # вычисляется
 
-    class Config:
-        from_attributes = True
 
-
-class ShiftReportCreate(BaseModel):
+class ShiftReportCreate(Model):
     report_date: date | None = None  # по умолчанию — сегодня
     start_time: datetime
     end_time: datetime
@@ -109,7 +98,7 @@ class ShiftReportCreate(BaseModel):
     sales_items: list[SaleItemCreate]
 
 
-class ShiftReportRead(BaseModel):
+class ShiftReportRead(Model):
     id: int
     report_date: date
     start_time: datetime
@@ -120,23 +109,20 @@ class ShiftReportRead(BaseModel):
     net_income: float
     sales_items: list[SaleItemRead]
 
-    class Config:
-        from_attributes = True
-
 
 # ========================
 # Долги (Debt)
 # ========================
 
 
-class DebtRecordCreate(BaseModel):
+class DebtRecordCreate(Model):
     description: str = Field(..., min_length=1, max_length=200)
     amount: float = Field(gt=0)
     is_supply_related: bool = False
     supply_id: int | None = None
 
 
-class DebtRecordRead(BaseModel):
+class DebtRecordRead(Model):
     id: int
     description: str
     amount: float
@@ -144,20 +130,14 @@ class DebtRecordRead(BaseModel):
     is_supply_related: bool
     supply_id: int | None
 
-    class Config:
-        from_attributes = True
 
-
-class DebtPaymentCreate(BaseModel):
+class DebtPaymentCreate(Model):
     amount: float = Field(gt=0)
     shift_report_id: int | None = None
 
 
-class DebtPaymentRead(BaseModel):
+class DebtPaymentRead(Model):
     id: int
     amount: float
     paid_at: datetime
     shift_report_id: int | None
-
-    class Config:
-        from_attributes = True

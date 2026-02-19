@@ -1,8 +1,14 @@
+from typing import TypeVar
+
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
+from src.database import Base
 
-def get_or_404(db: Session, model, id: int):
+T = TypeVar('T', bound=Base)
+
+
+def get_or_404(db: Session, model: type[T], id: int) -> T:
     obj = db.get(model, id)
     if not obj:
         raise HTTPException(

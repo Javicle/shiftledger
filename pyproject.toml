@@ -56,5 +56,3 @@ members = ["accounting-core", "telegram-bot"]
 
 
 
-[tool.basedpyright.analysis]
-reportUnusedExpression = false
